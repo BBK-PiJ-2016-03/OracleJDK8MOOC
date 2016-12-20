@@ -71,6 +71,14 @@ public class Lesson3 {
     int[][] distances = new int[LIST_SIZE][LIST_SIZE];
     
     // YOUR CODE HERE
+      IntStream source = IntStream.range(0, wordList.size());
+      if(parallel)
+          source = source.parallel();
+
+    distances = source.mapToObj(x -> IntStream.range(0, wordList.size())
+                    .map(y -> lesson3.Levenshtein.lev(wordList.get(x), wordList.get(y)))
+                    .toArray())
+            .toArray(int[][]::new);
     
     return distances;
   }
@@ -84,8 +92,18 @@ public class Lesson3 {
    */
   static List<String> processWords(List<String> wordList, boolean parallel) {
     // YOUR CODE HERE
-    
-    return null;
+      List<String> processed = getConcurrentlyCorrectStream(wordList, parallel)
+              .map(String::toUpperCase)
+              .collect(Collectors.toList());
+
+    return processed;
+  }
+
+  private static Stream<String> getConcurrentlyCorrectStream(List<String> wordList, boolean parallel){
+      if(parallel)
+          return wordList.parallelStream();
+
+      return wordList.stream();
   }
 
   /**
@@ -95,7 +113,7 @@ public class Lesson3 {
    * @throws IOException If word file cannot be read
    */
   public static void main(String[] args) throws IOException {
-    RandomWords fullWordList = new RandomWords();
+    lesson3.RandomWords fullWordList = new lesson3.RandomWords();
     List<String> wordList = fullWordList.createList(1000);
 
     measure("Sequential", () -> computeLevenshtein(wordList, false));

@@ -4,6 +4,8 @@
  * JDK 8 MOOC Lesson 3 homework
  */
 
+package lesson3;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +13,8 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class to generate a list of random words
@@ -26,8 +30,10 @@ public class RandomWords {
    * @throws IOException If the source words file cannot be read
    */
   public RandomWords() throws IOException {   
-    try (BufferedReader reader = Files.newBufferedReader(Paths.get("words"))) {
-      sourceWords = null;    // YOUR CODE HERE
+    try (BufferedReader reader = Files.newBufferedReader(Paths.get("words.txt"))) {
+      //sourceWords = null;    // YOUR CODE HERE
+      sourceWords = reader.lines()
+              .collect(Collectors.toList());
       
       System.out.println("Loaded " + sourceWords.size() + " words");
     }
@@ -42,6 +48,13 @@ public class RandomWords {
   public List<String> createList(int listSize) {
     Random rand = new Random();
     List<String> wordList = null; // YOUR CODE HERE
+
+      wordList = rand.ints(listSize)
+              .map(i -> Math.abs(i%sourceWords.size()))
+              .peek(System.out::println)
+              .mapToObj(i -> sourceWords.get(i))
+              .distinct()
+              .collect(Collectors.toList());
 
     return wordList;
   }
